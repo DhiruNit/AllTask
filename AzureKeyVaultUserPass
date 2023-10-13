@@ -1,0 +1,56 @@
+
+
+1- Create an Azure Key Vault:
+
+If you don't already have an Azure Key Vault, create one in the Azure portal.
+
+2- 
+Store Secrets in Azure Key Vault:
+
+Store the admin user and admin password securely in your Azure Key Vault.
+
+In the Azure portal, go to your Key Vault.
+Under "Settings," select "Secrets."
+Add a new secret for the admin username and another for the admin password.
+
+3-
+Configure Access Policies:
+
+Configure the necessary access policies to grant your VM permission to access the secrets in the Key Vault:
+
+In the Azure portal, go to your Key Vault.
+Under "Settings," select "Access policies."
+Add an access policy for your VM. Ensure that you grant it "Get" permissions on secrets.
+
+4-
+Enable Managed Identity for Your VM:
+
+You'll need to enable a managed identity for your VM to allow it to authenticate with Azure AD and access the Azure Key Vault. Here are the steps:
+
+In the Azure portal, go to your VM's settings.
+Under "Identity," enable the system-assigned managed identity.
+Save the settings.
+
+5- 
+Retrieve Secrets in Your VM:
+
+In your VM, you can use Azure libraries or SDKs to retrieve the secrets from Azure Key Vault securely using the managed identity. Here's an example for a Linux VM using the Azure CLI and jq to extract the secrets:
+
+Snnipit: 
+
+# Install jq if it's not already installed
+sudo apt-get install jq
+
+# Retrieve the admin username from Azure Key Vault
+admin_user=$(az keyvault secret show --vault-name <your-keyvault-name> --name <your-username-secret-name> --query value -o tsv)
+
+# Retrieve the admin password from Azure Key Vault
+admin_password=$(az keyvault secret show --vault-name <your-keyvault-name> --name <your-password-secret-name> --query value -o tsv)
+
+# Use the retrieved admin_user and admin_password as needed in your VM configuration
+
+
+
+Replace <your-keyvault-name>, <your-username-secret-name>, and <your-password-secret-name> with the actual values.
+
+This approach ensures that the admin user and admin password for your VM are securely stored in Azure Key Vault, and your VM retrieves them without exposing sensitive information in your scripts or configuration files. It also benefits from the security features and access controls provided by Azure Key Vault.
