@@ -1,0 +1,76 @@
+
+Creating a GitHub Action workflow to deploy a Terraform project in Azure involves defining a workflow YAML file. This workflow will be triggered when you push changes to your GitHub repository. 
+Ensure you have Azure credentials and the necessary Terraform files set up in your repository.
+
+Sample:
+
+name: Deploy Terraform to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.14.0
+
+    - name: Initialize Terraform
+      run: terraform init
+
+    - name: Plan Terraform Changes
+      run: terraform plan -out=tfplan
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    - name: Apply Terraform Changes
+      run: terraform apply -auto-approve tfplan
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+
+
+In this example:
+
+The workflow is triggered on a push to the main branch.
+
+It runs on an Ubuntu-based runner.
+
+It checks out your repository's code.
+
+It sets up Terraform with the specified version (0.14.0 in this case).
+
+Initializes the Terraform project.
+
+Plans the changes and creates a plan file.
+
+Applies the Terraform changes using the plan file.
+
+You need to configure the following GitHub secrets:
+
+ARM_CLIENT_ID: Your Azure Service Principal's client ID.
+ARM_CLIENT_SECRET: Your Azure Service Principal's client secret.
+ARM_SUBSCRIPTION_ID: Your Azure subscription ID.
+ARM_TENANT_ID: Your Azure AD tenant ID.
+Make sure to set up these secrets in your GitHub repository. This workflow assumes you have the Terraform code and configuration in your repository.
+
+When you push changes to the main branch, this workflow will run, deploying your Terraform project to Azure.
+
+
+
+
